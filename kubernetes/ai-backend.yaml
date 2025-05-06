@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ai-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ai-backend
+  template:
+    metadata:
+      labels:
+        app: ai-backend
+    spec:
+      containers:
+      - name: ai-backend
+        image: localhost:5000/ai-backend:latest
+        ports:
+        - containerPort: 80
+        env:
+        - name: AZURE_STORAGE_CONNECTION_STRING
+          valueFrom:
+            secretKeyRef:
+              name: azure-credentials
+              key: connection-string
+        - name: AZURE_SQL_CONNECTION_STRING
+          valueFrom:
+            secretKeyRef:
+              name: azure-credentials
+              key: sql-connection
+        - name: SPEECH_KEY
+          valueFrom:
+            secretKeyRef:
+              name: azure-credentials
+              key: speech-key
+        - name: SPEECH_REGION
+          valueFrom:
+            secretKeyRef:
+              name: azure-credentials
+              key: speech-region
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ai-backend
+spec:
+  selector:
+    app: ai-backend
+  ports:
+  - port: 92
+    targetPort: 80
+  type: ClusterIP

@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chat-backend
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: chat-backend
+  template:
+    metadata:
+      labels:
+        app: chat-backend
+    spec:
+      containers:
+      - name: chat-backend
+        image: localhost:5000/chat-backend:latest
+        ports:
+        - containerPort: 8080
+          name: tomcat
+        - containerPort: 80
+          name: nginx
+        env:
+        - name: DB_URL
+          value: jdbc:mysql://chat-mysql:3306/chat
+        - name: DB_USER
+          value: chatuser
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-pass
+              key: password
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: chat-backend
+spec:
+  selector:
+    app: chat-backend
+  ports:
+  - name: http
+    port: 88
+    targetPort: 80
+  type: ClusterIP
