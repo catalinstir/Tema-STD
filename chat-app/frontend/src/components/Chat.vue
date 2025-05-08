@@ -29,7 +29,8 @@ export default {
   },
   methods: {
     connectWebSocket() {
-      this.socket = new WebSocket('ws://' + window.location.hostname + ':88/chat');
+      // For Docker Compose testing, use localhost:88 instead of window.location.hostname
+      this.socket = new WebSocket('ws://localhost:88/chat');
       
       this.socket.onopen = () => {
         console.log('WebSocket connected');

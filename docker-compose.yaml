@@ -1,0 +1,109 @@
+version: '3.8'
+
+services:
+  # MySQL for Joomla
+  joomla-mysql:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: joomla
+      MYSQL_USER: joomla
+      MYSQL_PASSWORD: password
+    command: --default-authentication-plugin=mysql_native_password
+    volumes:
+      - joomla-mysql-data:/var/lib/mysql
+    networks:
+      - app-network
+
+  # Joomla CMS - revised configuration
+  joomla:
+    image: joomla:4.4.2-apache
+    depends_on:
+      - joomla-mysql
+    environment:
+      JOOMLA_DB_HOST: joomla-mysql
+      JOOMLA_DB_USER: joomla
+      JOOMLA_DB_PASSWORD: password
+      JOOMLA_DB_NAME: joomla
+    volumes:
+      - ./joomla/custom-template:/var/www/html/templates/custom-template
+    ports:
+      - "8080:80"  # Changed from port 80 to 8080
+    networks:
+      - app-network
+    restart: always  # Add restart policy
+
+  # MySQL for Chat
+  chat-mysql:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: chat
+      MYSQL_USER: chatuser
+      MYSQL_PASSWORD: password
+    command: --default-authentication-plugin=mysql_native_password
+    volumes:
+      - chat-mysql-data:/var/lib/mysql
+      - ./chat-app/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - app-network
+
+  # Chat Backend (Java + Nginx)
+  chat-backend:
+    build:
+      context: ./chat-app/backend/websocket-chat
+    environment:
+      DB_HOST: chat-mysql
+      DB_USER: chatuser
+      DB_PASSWORD: password
+    ports:
+      - "88:80"
+    depends_on:
+      - chat-mysql
+    networks:
+      - app-network
+
+  # Chat Frontend (Vue)
+  chat-frontend:
+    build:
+      context: ./chat-app/frontend
+    ports:
+      - "90:80"
+    networks:
+      - app-network
+
+  # AI Backend
+  ai-backend:
+    build:
+      context: ./ai-app/backend
+    environment:
+      AZURE_STORAGE_CONNECTION_STRING: "DefaultEndpointsProtocol=https;AccountName=youraccount;AccountKey=yourkey;EndpointSuffix=core.windows.net"
+      SQL_SERVER: "your-server.database.windows.net"
+      SQL_DATABASE: "ai-app"
+      SQL_USER: "admin"
+      SQL_PASSWORD: "password"
+      SPEECH_KEY: "yourspeechkey"
+      SPEECH_REGION: "westeurope"
+    ports:
+      - "92:80"
+    networks:
+      - app-network
+
+  # AI Frontend (Vue)
+  ai-frontend:
+    build:
+      context: ./ai-app/frontend
+    environment:
+      VUE_APP_API_URL: "http://localhost:92"
+    ports:
+      - "94:80"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  joomla-mysql-data:
+  chat-mysql-data:

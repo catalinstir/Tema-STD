@@ -99,8 +99,8 @@ export default {
       formData.append('audioFile', this.selectedFile);
       
       try {
-        // Using environment variable for API URL that will be set during build
-        const apiUrl = process.env.VUE_APP_API_URL || 'http://localhost:92';
+        // For Docker Compose testing, use localhost:92 directly
+        const apiUrl = 'http://localhost:92';
         const response = await fetch(`${apiUrl}/api/upload`, {
           method: 'POST',
           body: formData
@@ -132,7 +132,8 @@ export default {
     },
     async fetchHistory() {
       try {
-        const apiUrl = process.env.VUE_APP_API_URL || 'http://localhost:92';
+        // For Docker Compose testing, use localhost:92 directly
+        const apiUrl = 'http://localhost:92';
         const response = await fetch(`${apiUrl}/api/history`);
         
         if (!response.ok) {
@@ -262,3 +263,4 @@ h3 {
   color: #888;
   padding: 20px;
 }
+</style>

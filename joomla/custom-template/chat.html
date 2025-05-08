@@ -17,11 +17,12 @@
     </style>
 </head>
 <body>
-    <iframe src="http://chat-frontend:90" title="Chat Application"></iframe>
+    <!-- Using localhost port 90 for Docker Compose environment -->
+    <iframe src="http://localhost:90" title="Chat Application"></iframe>
 </body>
 </html>
 
-<!-- joomla/custom-template/ai.html -->
+<!-- ai.html -->
 <!DOCTYPE html>
 <html>
 <head>
@@ -41,11 +42,12 @@
     </style>
 </head>
 <body>
-    <iframe src="http://ai-frontend:94" title="AI Speech-to-Text Application"></iframe>
+    <!-- Using localhost port 94 for Docker Compose environment -->
+    <iframe src="http://localhost:94" title="AI Speech-to-Text Application"></iframe>
 </body>
 </html>
 
-<!-- joomla/custom-template/index.html (Homepage template) -->
+<!-- index.html (Homepage template) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -222,7 +224,8 @@
     
     <div class="chat-button" onclick="toggleChat()">Chat</div>
     <div class="chat-widget" id="chatWidget">
-        <iframe src="chat.html" title="Chat Application"></iframe>
+        <!-- Using localhost:90 for chat in Docker Compose environment -->
+        <iframe src="http://localhost:90" title="Chat Application"></iframe>
     </div>
     
     <script>
